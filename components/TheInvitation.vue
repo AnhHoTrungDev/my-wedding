@@ -1,0 +1,467 @@
+<template>
+  <div class="doc">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-grid-bg"></div>
+      <div class="hero-fx"><FxHoloHeart /></div>
+
+      <div class="hero-text">
+        <div class="seal-sm"><span class="font-han">囍</span></div>
+        <div class="kicker">WE'RE GETTING MARRIED</div>
+        <div class="hero-names font-script">
+          {{ w.groom }}<br /><span class="amp">&amp;</span> {{ w.bride }}
+        </div>
+        <div class="facts">
+          <div class="fact">
+            <div class="fact-top">{{ w.dateShort.slice(0, 5) }}</div>
+            <div class="fact-sub">{{ w.dateShort.slice(6) }}</div>
+          </div>
+          <div class="fact mid">
+            <div class="fact-top">{{ w.receptionTime }}</div>
+            <div class="fact-sub">{{ w.weekday.toUpperCase() }}</div>
+          </div>
+          <button type="button" class="fact link" @click="scrollToParty" :title="'Xem địa điểm ' + w.reception.name">
+            <div class="fact-top">{{ w.reception.name }}</div>
+            <div class="fact-sub">{{ w.reception.hall }}</div>
+          </button>
+        </div>
+        <button type="button" class="venue-jump" @click="scrollToParty">
+          <svg class="pin" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">
+            <path d="M12 22s7-6.13 7-12a7 7 0 1 0-14 0c0 5.87 7 12 7 12z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            <circle cx="12" cy="10" r="2.4" fill="currentColor"/>
+          </svg>
+          Xem địa điểm tiệc
+          <svg class="jump-arrow" viewBox="0 0 24 24" width="11" height="11" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+
+        <div class="invite-lbl">TRÂN TRỌNG KÍNH MỜI</div>
+        <div class="guest font-script">{{ tenKhach }}</div>
+      </div>
+
+      <div class="polaroid">
+        <img :src="w.photo" :alt="'Ảnh cưới ' + w.groom + ' và ' + w.bride" />
+        <div class="polaroid-cap font-script">{{ w.dateSpaced }} ♥</div>
+      </div>
+
+      <div class="scroll-hint">
+        <div class="sh-text">CUỘN XUỐNG</div>
+        <div class="sh-arrow">▾</div>
+      </div>
+    </section>
+
+    <!-- COUNTDOWN -->
+    <section class="countdown reveal">
+      <div class="sec-kicker warm">ĐẾM NGƯỢC TỚI TIỆC CƯỚI</div>
+      <CountDown :target="w.date" />
+      <div class="cd-note font-script">Hẹn gặp quý khách tại Đà Nẵng!</div>
+    </section>
+
+    <!-- GIA ĐÌNH + BÁO TIN -->
+    <section class="family reveal">
+      <div class="family-inner">
+        <div class="families">
+          <div v-for="f in w.families" :key="f.side">
+            <div class="sec-kicker warm">{{ f.side }}</div>
+            <div class="fam-body">
+              <template v-for="(l, i) in f.lines" :key="l">
+                <span v-html="l"></span><br />
+              </template>
+              {{ f.address }}
+            </div>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="bao-tin">TRÂN TRỌNG BÁO TIN — LỄ THÀNH HÔN CỦA CON CHÚNG TÔI</div>
+        <div class="child font-serif">{{ w.groomFull }}</div>
+        <div class="roles">
+          <span>{{ w.groomRole.toUpperCase() }}</span>
+          <span class="heart">♥</span>
+          <span>{{ w.brideRole.toUpperCase() }}</span>
+        </div>
+        <div class="child font-serif">{{ w.brideFull }}</div>
+        <div class="ceremony">
+          {{ w.ceremony.title }}<br />
+          Vào lúc <strong>{{ w.ceremony.time }}</strong> — {{ w.weekday }}, ngày
+          <strong>{{ w.dateShort }}</strong><br />
+          <span class="lunar">{{ w.lunarLabel }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TIỆC CƯỚI -->
+    <section id="tiec-cuoi" class="party reveal">
+      <div class="party-fx"><FxSparkle /></div>
+      <div class="party-border"></div>
+      <div class="party-inner">
+        <div class="party-info">
+          <div class="ring-han"><span class="font-han">囍</span></div>
+          <div class="sec-kicker gold">TIỆC CƯỚI</div>
+          <div class="party-lead">Đến dự buổi tiệc chung vui cùng gia đình chúng tôi tại</div>
+          <div class="venue font-serif">{{ w.reception.name }}</div>
+          <div class="hall">{{ w.reception.hall }}</div>
+          <div class="party-addr">
+            {{ w.reception.venue }}<br />{{ w.reception.address }}
+          </div>
+          <div class="party-time">
+            <div>
+              <div class="pt-top">{{ w.receptionTime }}</div>
+              <div class="pt-sub">VÀO LÚC</div>
+            </div>
+            <div class="pt-div">
+              <div class="pt-top">{{ w.dateShort }}</div>
+              <div class="pt-sub">{{ w.lunarShort }}</div>
+            </div>
+          </div>
+          <div class="party-btns">
+            <a class="btn solid" :href="calendarUrl" target="_blank" rel="noopener">THÊM VÀO LỊCH</a>
+            <a class="btn ghost" :href="mapUrl" target="_blank" rel="noopener">CHỈ ĐƯỜNG</a>
+          </div>
+        </div>
+        <div class="party-map">
+          <iframe :src="mapEmbed" loading="lazy" title="Bản đồ Phì Lũ"></iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- MỪNG CƯỚI QR -->
+    <section class="gift reveal">
+      <div class="sec-kicker warm">HỘP MỪNG CƯỚI ONLINE</div>
+      <div class="gift-lead">
+        Sự hiện diện của quý khách là món quà quý giá nhất.<br />
+        Quý khách cũng có thể gửi lời chúc qua mã QR bên dưới.
+      </div>
+      <div class="qr">
+        <img
+          v-if="!qrFailed"
+          :src="w.gift.qr"
+          :alt="'QR mừng cưới — ' + w.gift.name"
+          @error="qrFailed = true"
+        />
+        <div v-else class="qr-empty">
+          <span class="font-han">福</span>
+          <p>Mã QR sẽ được cập nhật</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <section class="footer reveal">
+      <div class="foot-text">
+        Sự hiện diện của quý khách<br />là niềm vinh hạnh cho gia đình chúng tôi
+      </div>
+      <div class="foot-thanks font-script">Rất hân hạnh được đón tiếp!</div>
+      <div class="foot-seal"><span class="font-han">囍</span></div>
+    </section>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { wedding, calendarUrl, mapUrl, mapEmbed } from '~/data/wedding'
+const w = wedding
+
+const qrFailed = ref(false)
+useReveal()
+
+function scrollToParty() {
+  document.getElementById('tiec-cuoi')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
+// Tên khách lấy từ ?to= (đã tạo sẵn từ trang /invite); rỗng thì dùng mặc định
+const route = useRoute()
+const tenKhach = computed(() => {
+  const to = route.query.to
+  const v = Array.isArray(to) ? to[0] : to
+  return (v && v.trim()) || w.guestDefault
+})
+</script>
+
+<style scoped>
+.doc { background: var(--paper); }
+section { position: relative; }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  background: var(--paper-2);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 56px;
+  flex-wrap: wrap;
+  padding: 48px 6%;
+}
+.hero-grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(120, 100, 70, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(120, 100, 70, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+.hero-fx { position: absolute; inset: 0; opacity: 0.4; }
+
+.hero-text { position: relative; max-width: 460px; min-width: 300px; }
+.seal-sm {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--seal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+  animation: sealGlow 2.6s ease-in-out infinite;
+}
+.seal-sm span { font-size: 22px; color: #fcf6ea; }
+.kicker { font-size: 10px; letter-spacing: 6px; font-weight: 800; color: var(--soft); }
+.hero-names { margin-top: 10px; font-size: clamp(46px, 11vw, 60px); line-height: 1.15; }
+.amp { color: var(--seal); }
+.facts {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  max-width: 330px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  text-align: center;
+}
+.fact { padding: 13px 0; }
+.fact.mid { border-left: 1px solid var(--line); border-right: 1px solid var(--line); }
+/* Ô PHÌ LŨ bấm được → cuộn tới section Tiệc cưới */
+/* Ô PHÌ LŨ bấm được — giữ đồng nhất với 2 ô kia, chỉ đổi màu nhẹ khi rê chuột */
+.fact.link {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-align: center;
+  transition: color 0.2s ease;
+}
+.fact.link:hover .fact-top { color: var(--gold); }
+.fact.link:focus-visible { outline: 1px solid var(--gold); outline-offset: 2px; }
+
+/* Nút "Xem địa điểm tiệc" — hairline chữ hoa giãn cách, đúng ngôn ngữ thiệp */
+.venue-jump {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 20px;
+  padding: 9px 16px;
+  font-family: inherit;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--gold-warm);
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: border-color 0.25s ease, color 0.25s ease, background 0.25s ease;
+  /* Gợn sóng vàng lan ra rồi tắt — nhấp nháy tinh tế để gây tò mò */
+  animation: venuePing 3s ease-out infinite;
+}
+.pin { color: var(--seal); flex-shrink: 0; }
+.jump-arrow {
+  flex-shrink: 0;
+  animation: arrowBob 1.8s ease-in-out infinite;
+}
+.venue-jump:hover {
+  border-color: var(--gold);
+  color: var(--seal);
+  animation: none; /* dừng ping khi đã chú ý/hover */
+}
+.venue-jump:hover .jump-arrow { animation-duration: 0.9s; }
+.venue-jump:focus-visible { outline: 1px solid var(--gold); outline-offset: 2px; }
+
+@keyframes venuePing {
+  0% { box-shadow: 0 0 0 0 rgba(168, 129, 60, 0.35); }
+  60%, 100% { box-shadow: 0 0 0 8px rgba(168, 129, 60, 0); }
+}
+@keyframes arrowBob {
+  0%, 100% { transform: translateY(0); opacity: 0.7; }
+  50% { transform: translateY(2px); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .venue-jump, .jump-arrow { animation: none; }
+}
+.fact-top { font-size: 15px; font-weight: 800; }
+.fact-sub { margin-top: 2px; font-size: 9px; letter-spacing: 2px; color: var(--soft); }
+.invite-lbl { margin-top: 20px; font-size: 10px; letter-spacing: 4px; color: var(--soft); font-weight: 600; }
+.guest { margin-top: 4px; font-size: 30px; color: var(--gold); }
+
+.polaroid {
+  position: relative;
+  width: 320px;
+  background: #fff;
+  padding: 14px 14px 54px;
+  box-shadow: 0 18px 44px rgba(60, 50, 30, 0.25);
+  animation: swayPolaroid 6s ease-in-out infinite;
+}
+.polaroid img { display: block; width: 100%; height: 380px; object-fit: cover; object-position: 50% 12%; }
+.polaroid-cap {
+  position: absolute;
+  bottom: 16px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 21px;
+  color: #7a4f2a;
+}
+
+.scroll-hint {
+  position: absolute;
+  bottom: 22px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: var(--faint);
+}
+.sh-text { font-size: 9px; letter-spacing: 4px; font-weight: 600; }
+.sh-arrow { margin-top: 4px; font-size: 15px; color: var(--seal); animation: bounceDown 1.4s ease-in-out infinite; }
+
+/* ── section chung ── */
+.sec-kicker { font-size: 10px; letter-spacing: 5px; font-weight: 800; }
+.sec-kicker.warm { color: var(--gold-warm); }
+.sec-kicker.gold { color: var(--gold-bright); }
+
+/* ── COUNTDOWN ── */
+.countdown {
+  padding: 56px 24px;
+  border-top: 1px solid var(--line-2);
+  text-align: center;
+  background: #fff;
+}
+.cd-note { margin-top: 22px; font-size: 24px; color: var(--gold); }
+
+/* ── GIA ĐÌNH ── */
+.family { padding: 56px 24px; border-top: 1px solid var(--line-2); background: var(--paper-2); }
+.family-inner { max-width: 880px; margin: 0 auto; text-align: center; }
+.families {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 28px;
+}
+.fam-body { margin-top: 12px; font-size: 14px; line-height: 1.7; color: var(--muted); }
+.fam-body :deep(strong) { color: var(--ink); font-size: 15px; }
+.hr { margin: 36px auto; height: 1px; max-width: 520px; background: var(--line-2); }
+.bao-tin { font-size: 11px; letter-spacing: 3px; font-weight: 800; line-height: 2; }
+.child { margin-top: 22px; font-size: 32px; }
+.child + .roles + .child { margin-top: 0; }
+.roles {
+  margin: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--soft);
+  font-weight: 600;
+}
+.roles .heart { color: var(--seal); font-size: 15px; }
+.ceremony { margin-top: 26px; font-size: 14px; line-height: 1.9; color: var(--muted); }
+.ceremony :deep(strong), .ceremony strong { color: var(--ink); }
+.ceremony .lunar { color: var(--soft); }
+
+/* ── TIỆC CƯỚI ── */
+.party {
+  overflow: hidden;
+  padding: 64px 24px;
+  background: linear-gradient(150deg, var(--wine-1), var(--wine-2) 75%);
+}
+.party-fx { position: absolute; inset: 0; opacity: 0.55; }
+.party-border { position: absolute; inset: 14px; border: 1px solid rgba(230, 190, 110, 0.35); pointer-events: none; }
+.party-inner {
+  position: relative;
+  max-width: 880px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 36px;
+  align-items: center;
+}
+.party-info { text-align: center; color: var(--cream); }
+.ring-han {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  border: 1px solid var(--gold-bright);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ring-han span { font-size: 26px; color: var(--gold-bright); }
+.party-lead { margin-top: 12px; font-size: 13px; color: rgba(247, 232, 200, 0.85); }
+.venue { margin-top: 16px; font-size: clamp(42px, 10vw, 52px); letter-spacing: 2px; color: #fff; text-shadow: 0 2px 18px rgba(0, 0, 0, 0.3); }
+.hall { margin-top: 6px; font-size: 13px; letter-spacing: 3px; font-weight: 800; color: var(--gold-bright); }
+.party-addr { margin-top: 12px; font-size: 13px; line-height: 1.7; color: rgba(247, 232, 200, 0.85); }
+.party-time {
+  margin: 22px auto 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  max-width: 320px;
+  border-top: 1px solid rgba(230, 190, 110, 0.4);
+  border-bottom: 1px solid rgba(230, 190, 110, 0.4);
+}
+.party-time > div { padding: 14px 0; }
+.pt-div { border-left: 1px solid rgba(230, 190, 110, 0.4); }
+.pt-top { font-size: 19px; font-weight: 800; color: #fff; }
+.pt-sub { margin-top: 2px; font-size: 9px; letter-spacing: 2px; color: var(--gold-bright); }
+.party-btns { margin-top: 26px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  padding: 14px 22px;
+  border-radius: 2px;
+  transition: opacity 0.25s ease, background 0.25s ease, color 0.25s ease;
+}
+.btn.solid { background: var(--gold-bright); color: var(--wine-2); }
+.btn.solid:hover { opacity: 0.85; }
+.btn.ghost { background: transparent; color: var(--cream); border: 1px solid rgba(247, 232, 200, 0.7); }
+.btn.ghost:hover { background: var(--gold-bright); color: var(--wine-2); }
+.party-map { border: 1px solid rgba(230, 190, 110, 0.5); background: #fff; padding: 8px; box-shadow: 0 16px 44px rgba(0, 0, 0, 0.3); }
+.party-map iframe { display: block; width: 100%; height: 320px; border: 0; }
+
+/* ── MỪNG CƯỚI QR ── */
+.gift { padding: 56px 24px; border-top: 1px solid var(--line-2); background: #fff; text-align: center; }
+.gift-lead { margin-top: 14px; font-size: 13px; line-height: 1.8; color: var(--muted); }
+.qr { margin: 24px auto 0; max-width: 260px; border: 1px solid var(--line); background: #fff; }
+.qr img { display: block; width: 100%; }
+.qr-empty {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--soft);
+}
+.qr-empty .font-han { font-size: 40px; color: var(--gold); opacity: 0.7; }
+.qr-empty p { font-size: 11px; letter-spacing: 0.1em; }
+.gift-cap { margin-top: 12px; font-size: 12px; color: var(--muted); }
+
+/* ── FOOTER ── */
+.footer { padding: 44px 24px 56px; border-top: 1px solid var(--line-2); background: var(--paper-2); text-align: center; }
+.foot-text { font-size: 13px; line-height: 1.9; color: var(--muted); }
+.foot-thanks { margin-top: 12px; font-size: 32px; color: var(--gold); }
+.foot-seal {
+  margin: 18px auto 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--seal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse 1.8s ease-in-out infinite;
+}
+.foot-seal span { font-size: 20px; color: #fcf6ea; line-height: 1; }
+</style>

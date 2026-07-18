@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <circle cx="32" cy="32" r="30" fill="#b0233a"/>
+  <g font-family="Georgia, 'Times New Roman', serif" font-weight="700" text-anchor="middle" fill="#f7e8c8">
+    <text x="26" y="43" font-size="34">A</text>
+    <text x="38" y="43" font-size="34" stroke="#b0233a" stroke-width="3" paint-order="stroke">U</text>
+  </g>
+</svg>
