@@ -23,8 +23,6 @@ jobs:
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - uses: actions/setup-node@v4
         with:
