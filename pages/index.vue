@@ -6,11 +6,13 @@
 </template>
 
 <script setup lang="ts">
-// Lấy domain thật từ request để og:image / og:url là URL tuyệt đối
-// (mạng xã hội bắt buộc URL tuyệt đối) — tự đúng ở localhost lẫn khi deploy.
-const url = useRequestURL()
-const origin = url.origin
-const image = origin + '/couple.jpg'
+// URL tuyệt đối cho OG/Twitter (mạng xã hội bắt buộc). Ưu tiên siteUrl cấu hình
+// (CI đặt = URL GitHub Pages); local dev rỗng thì suy ra từ request + baseURL.
+const config = useRuntimeConfig()
+const req = useRequestURL()
+const base = config.app.baseURL.endsWith('/') ? config.app.baseURL.slice(0, -1) : config.app.baseURL
+const site = (config.public.siteUrl as string) || req.origin + base
+const image = site + '/couple.jpg'
 
 const title = 'Trung Anh ♥ Phương Uyên — Thiệp cưới 03.08.2026'
 const description =
@@ -26,7 +28,7 @@ useSeoMeta({
   ogImageWidth: 1600,
   ogImageHeight: 2400,
   ogImageType: 'image/jpeg',
-  ogUrl: url.href,
+  ogUrl: site + '/',
   ogSiteName: 'Thiệp cưới Trung Anh & Phương Uyên',
   ogLocale: 'vi_VN',
   twitterCard: 'summary_large_image',

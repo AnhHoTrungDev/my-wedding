@@ -39,7 +39,7 @@
       </div>
 
       <div class="polaroid">
-        <img :src="w.photo" :alt="'Ảnh cưới ' + w.groom + ' và ' + w.bride" />
+        <img :src="photoUrl" :alt="'Ảnh cưới ' + w.groom + ' và ' + w.bride" />
         <div class="polaroid-cap font-script">{{ w.dateSpaced }} ♥</div>
       </div>
 
@@ -133,7 +133,7 @@
       <div class="qr">
         <img
           v-if="!qrFailed"
-          :src="w.gift.qr"
+          :src="qrUrl"
           :alt="'QR mừng cưới — ' + w.gift.name"
           @error="qrFailed = true"
         />
@@ -162,13 +162,22 @@ const w = wedding
 const qrFailed = ref(false)
 useReveal()
 
+// Đường dẫn ảnh có prefix baseURL để chạy đúng trên GitHub Pages (/my-wedding/…)
+const photoUrl = useAsset(w.photo)
+const qrUrl = useAsset(w.gift.qr)
+
 function scrollToParty() {
   document.getElementById('tiec-cuoi')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
-// Tên khách lấy từ ?to= (đã tạo sẵn từ trang /invite); rỗng thì dùng mặc định
+// Tên khách lấy từ ?to= (tạo ở trang /invite). Khi build tĩnh, HTML prerender
+// không có query nên hiện guestDefault; đợi mounted mới đọc query để tránh
+// hydration mismatch, rồi swap sang tên thật.
 const route = useRoute()
+const mounted = ref(false)
+onMounted(() => (mounted.value = true))
 const tenKhach = computed(() => {
+  if (!mounted.value) return w.guestDefault
   const to = route.query.to
   const v = Array.isArray(to) ? to[0] : to
   return (v && v.trim()) || w.guestDefault
