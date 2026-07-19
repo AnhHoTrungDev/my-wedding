@@ -67,6 +67,9 @@ function unbind() {
 }
 
 onMounted(() => {
+  // Luôn mở thiệp từ đầu trang với bìa đóng — không để trình duyệt khôi phục
+  // vị trí cuộn cũ khi reload (gây bìa tự mở / nhảy vị trí).
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
   document.body.style.overflow = 'hidden'
   window.scrollTo(0, 0)
   bind()

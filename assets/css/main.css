@@ -18,7 +18,9 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+/* scrollbar-gutter: luôn chừa chỗ thanh cuộn, để khi mở thiệp (bật lại scroll)
+   thanh cuộn xuất hiện không đẩy nội dung lệch trái gây giật. */
+html { scroll-behavior: smooth; scrollbar-gutter: stable; }
 
 body {
   background: var(--paper);

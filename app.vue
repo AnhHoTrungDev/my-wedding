@@ -1,3 +1,6 @@
 <template>
-  <NuxtPage />
+  <div>
+    <TheSplash />
+    <NuxtPage />
+  </div>
 </template>
