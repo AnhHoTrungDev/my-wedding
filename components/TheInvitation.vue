@@ -209,6 +209,14 @@ section { position: relative; }
   background-size: 40px 40px;
 }
 .hero-fx { position: absolute; inset: 0; opacity: 0.4; }
+/* Mobile: thu nhỏ + làm mờ tim hạt để không đè lên chữ khi bố cục xếp dọc */
+@media (max-width: 760px) {
+  .hero-fx {
+    opacity: 0.18;
+    transform: scale(0.6) translateY(-12%);
+    transform-origin: center center;
+  }
+}
 
 .hero-text { position: relative; max-width: 460px; min-width: 300px; }
 .seal-sm {
