@@ -151,6 +151,11 @@
       </div>
       <div class="foot-thanks font-script">Rất hân hạnh được đón tiếp!</div>
       <div class="foot-seal"><span class="font-han">囍</span></div>
+
+      <div class="foot-meta">
+        <NuxtLink to="/sitemap" class="foot-link">Tất cả các trang ↗</NuxtLink>
+        <div class="copyright">© 2026 Trung Anh &amp; Phương Uyên. All rights reserved.</div>
+      </div>
     </section>
   </div>
 </template>
@@ -481,4 +486,24 @@ section { position: relative; }
   animation: pulse 1.8s ease-in-out infinite;
 }
 .foot-seal span { font-size: 20px; color: #fcf6ea; line-height: 1; }
+
+.foot-meta { margin-top: 28px; }
+.foot-link {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--gold-warm);
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 3px;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.foot-link:hover { color: var(--seal); border-bottom-color: var(--gold); }
+.copyright {
+  margin-top: 16px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--faint);
+}
 </style>

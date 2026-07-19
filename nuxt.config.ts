@@ -39,7 +39,7 @@ export default defineNuxtConfig({
 
   nitro: {
     prerender: {
-      routes: ['/', '/invite'],
+      routes: ['/', '/invite', '/sitemap'],
       failOnError: false
     }
   }
