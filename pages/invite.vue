@@ -68,9 +68,20 @@ const styles: { id: StyleId; name: string; example: string }[] = [
 const style = ref<StyleId>('gia-dinh')
 const name = ref('')
 const copied = ref(false)
-const origin = ref('')
+// URL gốc của thiệp = origin + baseURL (/my-wedding/). Ưu tiên siteUrl tuyệt đối
+// đã cấu hình khi build; dev thì suy ra từ window.location + baseURL.
+const config = useRuntimeConfig()
+const home = ref('')
 
-onMounted(() => { origin.value = window.location.origin })
+onMounted(() => {
+  const site = config.public.siteUrl as string
+  if (site) {
+    home.value = site.endsWith('/') ? site : site + '/'
+  } else {
+    const base = config.app.baseURL
+    home.value = window.location.origin + (base.endsWith('/') ? base : base + '/')
+  }
+})
 
 const placeholder = computed(() =>
   style.value === 'gia-dinh' ? 'VD: Anh Ba'
@@ -90,9 +101,9 @@ const display = computed(() => {
 const canCopy = computed(() => display.value.length > 0)
 
 const url = computed(() => {
-  const base = origin.value || ''
-  if (!display.value) return `${base}/`
-  return `${base}/?to=${encodeURIComponent(display.value)}`
+  if (!home.value) return ''
+  if (!display.value) return home.value
+  return `${home.value}?to=${encodeURIComponent(display.value)}`
 })
 
 watch([name, style], () => (copied.value = false))
