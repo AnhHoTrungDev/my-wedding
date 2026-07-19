@@ -43,12 +43,28 @@ const w = wedding
 const opened = ref(false)
 const emit = defineEmits<{ opened: [] }>()
 
+// Chặn cuộn bằng cảm ứng — trong webview (Zalo/Messenger/FB) overflow:hidden
+// KHÔNG chặn được touch-scroll, nên phải preventDefault touchmove (không passive).
+function blockTouch(e: TouchEvent) {
+  e.preventDefault()
+}
+function lockScroll() {
+  document.body.style.overflow = 'hidden'
+  document.documentElement.style.overflow = 'hidden'
+  window.addEventListener('touchmove', blockTouch, { passive: false })
+}
+function unlockScroll() {
+  document.body.style.overflow = ''
+  document.documentElement.style.overflow = ''
+  window.removeEventListener('touchmove', blockTouch)
+}
+
 function open() {
   if (opened.value) return
   opened.value = true
   emit('opened')
-  // Trả lại khả năng cuộn sau khi cửa mở xong
-  setTimeout(() => { document.body.style.overflow = '' }, 1250)
+  // Chỉ cho cuộn sau khi cửa mở xong (khớp thời lượng animation 1250ms)
+  setTimeout(unlockScroll, 1250)
   unbind()
 }
 
@@ -70,13 +86,13 @@ onMounted(() => {
   // Luôn mở thiệp từ đầu trang với bìa đóng — không để trình duyệt khôi phục
   // vị trí cuộn cũ khi reload (gây bìa tự mở / nhảy vị trí).
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
-  document.body.style.overflow = 'hidden'
   window.scrollTo(0, 0)
+  lockScroll()
   bind()
 })
 onUnmounted(() => {
   unbind()
-  document.body.style.overflow = ''
+  unlockScroll()
 })
 </script>
 
