@@ -58,14 +58,15 @@
 <script setup lang="ts">
 useHead({ title: 'Tạo link mời — Trung Anh ♥ Phương Uyên' })
 
-type StyleId = 'gia-dinh' | 'vo-chong' | 'tim'
+type StyleId = 'tu-do' | 'gia-dinh' | 'vo-chong' | 'tim'
 const styles: { id: StyleId; name: string; example: string }[] = [
+  { id: 'tu-do', name: 'Tự nhập', example: 'Gõ gì cũng được' },
   { id: 'gia-dinh', name: 'Gia đình', example: 'Gia đình Anh Ba' },
   { id: 'vo-chong', name: 'Vợ Chồng', example: 'Vợ Chồng Em Đức' },
   { id: 'tim', name: 'Tên + ♥', example: 'Anh Tú ♥' }
 ]
 
-const style = ref<StyleId>('gia-dinh')
+const style = ref<StyleId>('tu-do')
 const name = ref('')
 const copied = ref(false)
 // URL gốc của thiệp = origin + baseURL (/my-wedding/). Ưu tiên siteUrl tuyệt đối
@@ -84,15 +85,17 @@ onMounted(() => {
 })
 
 const placeholder = computed(() =>
-  style.value === 'gia-dinh' ? 'VD: Anh Ba'
-    : style.value === 'vo-chong' ? 'VD: Em Đức'
-      : 'VD: Anh Tú'
+  style.value === 'tu-do' ? 'Gõ gì cũng được, VD: Cô Sáu & gia đình'
+    : style.value === 'gia-dinh' ? 'VD: Anh Ba'
+      : style.value === 'vo-chong' ? 'VD: Em Đức'
+        : 'VD: Anh Tú'
 )
 
 // Chuỗi hiển thị đúng như thiệp sẽ render ở dòng "TRÂN TRỌNG KÍNH MỜI"
 const display = computed(() => {
   const n = name.value.trim()
   if (!n) return ''
+  if (style.value === 'tu-do') return n
   if (style.value === 'gia-dinh') return `Gia đình ${n}`
   if (style.value === 'vo-chong') return `Vợ Chồng ${n}`
   return `${n} ♥`
@@ -168,7 +171,7 @@ h1 { font-family: 'Prata', serif; font-size: 26px; font-weight: 400; }
   color: var(--gold-warm);
   text-align: left;
 }
-.styles { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.styles { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 8px; }
 .style {
   display: flex;
   flex-direction: column;
