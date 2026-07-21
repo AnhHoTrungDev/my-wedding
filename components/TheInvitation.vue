@@ -1,7 +1,7 @@
 <template>
   <div class="doc">
     <!-- HERO -->
-    <section class="hero">
+    <section class="hero" :class="{ entered }">
       <div class="hero-grid-bg"></div>
       <div class="hero-fx"><FxHoloHeart /></div>
 
@@ -38,9 +38,12 @@
         <div class="guest font-script">{{ tenKhach }}</div>
       </div>
 
-      <div class="polaroid">
-        <img :src="photoUrl" :alt="'Ảnh cưới ' + w.groom + ' và ' + w.bride" />
-        <div class="polaroid-cap font-script">{{ w.dateSpaced }} ♥</div>
+      <!-- Bọc ngoài để animation "vào" không đè lên animation lắc lư của khung ảnh -->
+      <div class="polaroid-wrap">
+        <div class="polaroid">
+          <img :src="photoUrl" :alt="'Ảnh cưới ' + w.groom + ' và ' + w.bride" />
+          <div class="polaroid-cap font-script">{{ w.dateSpaced }} ♥</div>
+        </div>
       </div>
 
       <div class="scroll-hint">
@@ -163,6 +166,9 @@
 <script setup lang="ts">
 import { wedding, calendarUrl, mapUrl, mapEmbed } from '~/data/wedding'
 const w = wedding
+
+// entered = bìa 囍 đã mở → chạy animation vào cho Hero
+defineProps<{ entered?: boolean }>()
 
 const qrFailed = ref(false)
 useReveal()
@@ -313,6 +319,37 @@ section { position: relative; }
 .fact-sub { margin-top: 2px; font-size: 9px; letter-spacing: 2px; color: var(--soft); }
 .invite-lbl { margin-top: 20px; font-size: 10px; letter-spacing: 4px; color: var(--soft); font-weight: 600; }
 .guest { margin-top: 4px; font-size: 30px; color: var(--gold); }
+
+/* ── Animation "vào" khi mở bìa 囍 ──
+   Chỉ chạy khi có class .entered (lúc cửa bắt đầu trượt), so le nhẹ nhàng.
+   Dùng fill-mode both nên trước khi chạy phần tử vẫn ở trạng thái bình thường
+   (nằm sau bìa nên không thấy) — không lo bị ẩn vĩnh viễn nếu thiếu JS. */
+@keyframes heroIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes photoIn {
+  from { opacity: 0; transform: translateY(26px) scale(0.94) rotate(-3deg); }
+  to { opacity: 1; transform: none; }
+}
+.hero.entered .seal-sm { animation: heroIn 0.75s cubic-bezier(0.2, 0.7, 0.2, 1) 0.35s both; }
+.hero.entered .kicker { animation: heroIn 0.75s cubic-bezier(0.2, 0.7, 0.2, 1) 0.44s both; }
+.hero.entered .hero-names { animation: heroIn 0.85s cubic-bezier(0.2, 0.7, 0.2, 1) 0.52s both; }
+.hero.entered .facts { animation: heroIn 0.75s cubic-bezier(0.2, 0.7, 0.2, 1) 0.66s both; }
+.hero.entered .venue-jump { animation: heroIn 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 0.76s both; }
+.hero.entered .invite-lbl { animation: heroIn 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 0.84s both; }
+.hero.entered .guest { animation: heroIn 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) 0.92s both; }
+.hero.entered .polaroid-wrap { animation: photoIn 1s cubic-bezier(0.2, 0.7, 0.2, 1) 0.5s both; }
+.hero.entered .scroll-hint { animation: heroIn 0.7s ease 1.2s both; }
+/* Không animate .hero-fx: nó có opacity riêng (0.4 desktop / 0.18 mobile),
+   animate opacity sẽ kéo về 1 làm hạt tim đậm lên và hỏng fix mobile. */
+
+@media (prefers-reduced-motion: reduce) {
+  .hero.entered .seal-sm, .hero.entered .kicker, .hero.entered .hero-names,
+  .hero.entered .facts, .hero.entered .venue-jump, .hero.entered .invite-lbl,
+  .hero.entered .guest, .hero.entered .polaroid-wrap, .hero.entered .scroll-hint
+  { animation: none; }
+}
 
 .polaroid {
   position: relative;

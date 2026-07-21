@@ -1,13 +1,16 @@
 <template>
   <div>
-    <TheCover />
-    <TheInvitation />
+    <TheCover @opened="entered = true" />
+    <TheInvitation :entered="entered" />
   </div>
 </template>
 
 <script setup lang="ts">
 // URL tuyệt đối cho OG/Twitter (mạng xã hội bắt buộc). Ưu tiên siteUrl cấu hình
 // (CI đặt = URL GitHub Pages); local dev rỗng thì suy ra từ request + baseURL.
+// Cờ "đã mở bìa" → kích hoạt animation vào của Hero (ảnh + nội dung)
+const entered = ref(false)
+
 const config = useRuntimeConfig()
 const req = useRequestURL()
 const base = config.app.baseURL.endsWith('/') ? config.app.baseURL.slice(0, -1) : config.app.baseURL
