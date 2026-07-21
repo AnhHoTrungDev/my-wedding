@@ -41,7 +41,12 @@
       <!-- Bọc ngoài để animation "vào" không đè lên animation lắc lư của khung ảnh -->
       <div class="polaroid-wrap">
         <div class="polaroid">
-          <img :src="photoUrl" :alt="'Ảnh cưới ' + w.groom + ' và ' + w.bride" />
+          <img
+            :src="photoUrl"
+            :srcset="photoSrcset"
+            sizes="320px"
+            :alt="'Ảnh cưới ' + w.groom + ' và ' + w.bride"
+          />
           <div class="polaroid-cap font-script">{{ w.dateSpaced }} ♥</div>
         </div>
       </div>
@@ -175,6 +180,8 @@ useReveal()
 
 // Đường dẫn ảnh có prefix baseURL để chạy đúng trên GitHub Pages (/my-wedding/…)
 const photoUrl = useAsset(w.photo)
+// Màn thường lấy bản 400px, màn retina lấy 800px → nét ở mọi loại màn, đỡ tốn data
+const photoSrcset = `${useAsset('/couple-400.jpg')} 400w, ${photoUrl} 800w`
 const qrUrl = useAsset(w.gift.qr)
 
 function scrollToParty() {
@@ -352,6 +359,10 @@ section { position: relative; }
 }
 
 .polaroid {
+  /* Khử răng cưa khi khung xoay: giữ layer GPU riêng, ép lọc mượt */
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   position: relative;
   width: 320px;
   background: #fff;

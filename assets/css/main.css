@@ -48,9 +48,11 @@ a:hover { color: var(--seal); }
   0%, 100% { box-shadow: 0 0 0 0 rgba(176, 35, 58, 0.30); }
   50% { box-shadow: 0 0 0 22px rgba(176, 35, 58, 0); }
 }
+/* translateZ(0) giữ khung ảnh trên layer GPU riêng → viền xoay được khử răng cưa
+   (không có nó, phần tử xoay bị vẽ bậc thang) */
 @keyframes swayPolaroid {
-  0%, 100% { transform: rotate(3.5deg); }
-  50% { transform: rotate(5deg); }
+  0%, 100% { transform: rotate(3.5deg) translateZ(0); }
+  50% { transform: rotate(5deg) translateZ(0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
