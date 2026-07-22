@@ -26,7 +26,10 @@ export function useReveal() {
             io.unobserve(el)
           }
         },
-        { threshold: 0.12 }
+        // rootMargin âm ở đáy: co vùng quan sát lên 22% từ dưới, nên section
+        // chỉ trigger khi đã cuộn vào sâu (mép trên tới ~78% màn hình), thay vì
+        // vừa ló ra là chạy.
+        { threshold: 0, rootMargin: '0px 0px -22% 0px' }
       )
 
       for (const el of els as (HTMLElement & { __kids?: HTMLElement[] })[]) {
