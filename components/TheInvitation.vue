@@ -188,6 +188,20 @@ function scrollToParty() {
   document.getElementById('tiec-cuoi')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
+// Mobile: gợi ý "CUỘN XUỐNG" cố định đáy màn, mờ đi khi đã cuộn khỏi Hero.
+let hintScroll: (() => void) | null = null
+onMounted(() => {
+  if (!window.matchMedia?.('(max-width: 760px)').matches) return
+  const hint = document.querySelector('.scroll-hint')
+  if (!hint) return
+  hintScroll = () => hint.classList.toggle('hide', window.scrollY > 90)
+  window.addEventListener('scroll', hintScroll, { passive: true })
+  hintScroll()
+})
+onUnmounted(() => {
+  if (hintScroll) window.removeEventListener('scroll', hintScroll)
+})
+
 // Tên khách lấy từ ?to= (tạo ở trang /invite). Khi build tĩnh, HTML prerender
 // không có query nên hiện guestDefault; đợi mounted mới đọc query để tránh
 // hydration mismatch, rồi swap sang tên thật.
@@ -353,6 +367,9 @@ section { position: relative; }
    useReveal xử lý (hiện khi ~50% ảnh vào màn). */
 @media (max-width: 760px) {
   .hero.entered .polaroid-wrap { animation: none; }
+  /* Bỏ animation-vào cho hint (đặt SAU rule entrance để thắng): opacity do
+     class .hide điều khiển, không bị animation fill khoá ở 1. */
+  .hero.entered .scroll-hint { animation: none; }
 }
 /* Không animate .hero-fx: nó có opacity riêng (0.4 desktop / 0.18 mobile),
    animate opacity sẽ kéo về 1 làm hạt tim đậm lên và hỏng fix mobile. */
@@ -397,6 +414,19 @@ section { position: relative; }
 }
 .sh-text { font-size: 9px; letter-spacing: 4px; font-weight: 600; }
 .sh-arrow { margin-top: 4px; font-size: 15px; color: var(--seal); animation: bounceDown 1.4s ease-in-out infinite; }
+
+/* Mobile: gợi ý "CUỘN XUỐNG" cố định đáy màn (luôn thấy khi ở Hero), mờ đi khi
+   đã cuộn khỏi Hero. Đặt SAU rule .scroll-hint gốc để thắng (media query không
+   tăng specificity). */
+@media (max-width: 760px) {
+  .scroll-hint {
+    position: fixed;
+    bottom: 14px;
+    z-index: 7;
+    transition: opacity 0.45s ease;
+  }
+  .scroll-hint.hide { opacity: 0; pointer-events: none; }
+}
 
 /* ── section chung ── */
 .sec-kicker { font-size: 10px; letter-spacing: 5px; font-weight: 800; }
