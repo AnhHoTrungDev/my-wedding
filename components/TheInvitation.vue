@@ -348,6 +348,12 @@ section { position: relative; }
 .hero.entered .guest { animation: heroIn 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) 0.92s both; }
 .hero.entered .polaroid-wrap { animation: photoIn 1s cubic-bezier(0.2, 0.7, 0.2, 1) 0.5s both; }
 .hero.entered .scroll-hint { animation: heroIn 0.7s ease 1.2s both; }
+/* Mobile: ảnh nằm dưới màn khi mở bìa → BỎ animation-lúc-mở-bìa (đặt SAU rule
+   trên để thắng vì media query không tăng specificity); reveal theo scroll do
+   useReveal xử lý (hiện khi ~50% ảnh vào màn). */
+@media (max-width: 760px) {
+  .hero.entered .polaroid-wrap { animation: none; }
+}
 /* Không animate .hero-fx: nó có opacity riêng (0.4 desktop / 0.18 mobile),
    animate opacity sẽ kéo về 1 làm hạt tim đậm lên và hỏng fix mobile. */
 

@@ -49,6 +49,29 @@ export function useReveal() {
         el.__kids = kids
         io.observe(el)
       }
+
+      // Mobile: ảnh Polaroid ở Hero hiện theo scroll — chỉ khi ~50% (tầm giữa)
+      // ảnh vào màn hình mới fade/scale vào, tránh cảnh ảnh bị viewport cắt ngang.
+      const isMobile = window.matchMedia?.('(max-width: 760px)').matches
+      const photo = document.querySelector<HTMLElement>('.polaroid-wrap')
+      if (isMobile && photo) {
+        photo.style.opacity = '0'
+        photo.style.transform = 'translateY(26px) scale(0.96)'
+        photo.style.transition =
+          'opacity 0.9s ease, transform 0.9s cubic-bezier(0.2,0.7,0.2,1)'
+        const pio = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (!e.isIntersecting) continue
+              photo.style.opacity = '1'
+              photo.style.transform = 'none'
+              pio.unobserve(photo)
+            }
+          },
+          { threshold: 0.5 }
+        )
+        pio.observe(photo)
+      }
     }, 400)
 
     onUnmounted(() => clearTimeout(timer))
