@@ -194,7 +194,8 @@ onMounted(() => {
   if (!window.matchMedia?.('(max-width: 760px)').matches) return
   const hint = document.querySelector('.scroll-hint')
   if (!hint) return
-  hintScroll = () => hint.classList.toggle('hide', window.scrollY > 90)
+  // Ẩn ngay khi vừa cuộn (không đợi tới ảnh) để hint không bao giờ đè lên ảnh
+  hintScroll = () => hint.classList.toggle('hide', window.scrollY > 12)
   window.addEventListener('scroll', hintScroll, { passive: true })
   hintScroll()
 })
