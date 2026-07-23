@@ -126,7 +126,18 @@
           </div>
         </div>
         <div class="party-map">
-          <iframe :src="mapEmbed" loading="lazy" title="Bản đồ Phì Lũ"></iframe>
+          <!-- Facade: chỉ tải iframe Google Maps khi bấm → tránh giật lúc cuộn -->
+          <button v-if="!mapOpen" type="button" class="map-facade" @click="mapOpen = true" aria-label="Mở bản đồ Phì Lũ">
+            <span class="map-grid" aria-hidden="true"></span>
+            <span class="map-pin">
+              <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">
+                <path d="M12 22s7-6.13 7-12a7 7 0 1 0-14 0c0 5.87 7 12 7 12z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                <circle cx="12" cy="10" r="2.6" fill="currentColor"/>
+              </svg>
+            </span>
+            <span class="map-label">Xem bản đồ · {{ w.reception.name }}</span>
+          </button>
+          <iframe v-else :src="mapEmbed" title="Bản đồ Phì Lũ" loading="lazy"></iframe>
         </div>
       </div>
     </section>
@@ -176,6 +187,7 @@ const w = wedding
 defineProps<{ entered?: boolean }>()
 
 const qrFailed = ref(false)
+const mapOpen = ref(false)
 useReveal()
 
 // Đường dẫn ảnh có prefix baseURL để chạy đúng trên GitHub Pages (/my-wedding/…)
@@ -536,6 +548,52 @@ section { position: relative; }
 .btn.ghost:hover { background: var(--gold-bright); color: var(--wine-2); }
 .party-map { border: 1px solid rgba(230, 190, 110, 0.5); background: #fff; padding: 8px; box-shadow: 0 16px 44px rgba(0, 0, 0, 0.3); }
 .party-map iframe { display: block; width: 100%; height: 320px; border: 0; }
+
+/* Facade bản đồ (thay iframe cho tới khi bấm) */
+.map-facade {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 320px;
+  border: 0;
+  cursor: pointer;
+  overflow: hidden;
+  background: #eef1ec;
+  color: var(--wine-1);
+  transition: background 0.25s ease;
+}
+.map-facade:hover { background: #e7ebe4; }
+.map-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(90, 35, 32, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(90, 35, 32, 0.08) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+.map-pin {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--seal);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+}
+.map-label {
+  position: relative;
+  font-size: 12px;
+  letter-spacing: 1px;
+  font-weight: 700;
+  color: var(--wine-1);
+}
 
 /* ── MỪNG CƯỚI QR ── */
 .gift { padding: 56px 24px; border-top: 1px solid var(--line-2); background: #fff; text-align: center; }
