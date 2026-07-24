@@ -126,8 +126,24 @@
           </div>
         </div>
         <div class="party-map">
-          <!-- Facade: chỉ tải iframe Google Maps khi bấm → tránh giật lúc cuộn -->
-          <button v-if="!mapOpen" type="button" class="map-facade" @click="mapOpen = true" aria-label="Mở bản đồ Phì Lũ">
+          <!-- Map tải sớm (không cần bấm). Lớp phủ hiện tới khi load xong (tránh
+               flash); load lỗi/timeout → placeholder có link chỉ đường. -->
+          <iframe
+            v-if="mapSrc"
+            :src="mapSrc"
+            title="Bản đồ Phì Lũ"
+            class="map-frame"
+            :class="{ ready: mapReady }"
+            @load="onMapLoad"
+          ></iframe>
+          <a
+            v-if="!mapReady"
+            class="map-cover"
+            :class="{ error: mapError }"
+            :href="mapUrl"
+            target="_blank"
+            rel="noopener"
+          >
             <span class="map-grid" aria-hidden="true"></span>
             <span class="map-pin">
               <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">
@@ -135,9 +151,10 @@
                 <circle cx="12" cy="10" r="2.6" fill="currentColor"/>
               </svg>
             </span>
-            <span class="map-label">Xem bản đồ · {{ w.reception.name }}</span>
-          </button>
-          <iframe v-else :src="mapEmbed" title="Bản đồ Phì Lũ" loading="lazy"></iframe>
+            <span class="map-label">
+              {{ mapError ? 'Không tải được bản đồ · Nhấn để chỉ đường' : 'Đang tải bản đồ…' }}
+            </span>
+          </a>
         </div>
       </div>
     </section>
@@ -187,8 +204,31 @@ const w = wedding
 defineProps<{ entered?: boolean }>()
 
 const qrFailed = ref(false)
-const mapOpen = ref(false)
 useReveal()
+
+// Bản đồ: gán src phía client (sau mount) để iframe tải sớm nhưng listener
+// @load luôn bắt được sự kiện; lớp phủ hiện tới khi load xong; 12s → coi lỗi.
+const mapSrc = ref('')
+const mapReady = ref(false)
+const mapError = ref(false)
+let mapTimer: ReturnType<typeof setTimeout> | undefined
+function onMapLoad() {
+  // đợi một nhịp cho tile vẽ xong rồi mới bỏ lớp phủ, tránh flash trắng
+  setTimeout(() => {
+    mapReady.value = true
+    mapError.value = false
+    if (mapTimer) clearTimeout(mapTimer)
+  }, 500)
+}
+onMounted(() => {
+  mapSrc.value = mapEmbed
+  mapTimer = setTimeout(() => {
+    if (!mapReady.value) mapError.value = true
+  }, 12000)
+})
+onUnmounted(() => {
+  if (mapTimer) clearTimeout(mapTimer)
+})
 
 // Đường dẫn ảnh có prefix baseURL để chạy đúng trên GitHub Pages (/my-wedding/…)
 const photoUrl = useAsset(w.photo)
@@ -546,27 +586,32 @@ section { position: relative; }
 .btn.solid:hover { opacity: 0.85; }
 .btn.ghost { background: transparent; color: var(--cream); border: 1px solid rgba(247, 232, 200, 0.7); }
 .btn.ghost:hover { background: var(--gold-bright); color: var(--wine-2); }
-.party-map { border: 1px solid rgba(230, 190, 110, 0.5); background: #fff; padding: 8px; box-shadow: 0 16px 44px rgba(0, 0, 0, 0.3); }
-.party-map iframe { display: block; width: 100%; height: 320px; border: 0; }
+.party-map { position: relative; border: 1px solid rgba(230, 190, 110, 0.5); background: #fff; padding: 8px; box-shadow: 0 16px 44px rgba(0, 0, 0, 0.3); }
+.map-frame {
+  display: block;
+  width: 100%;
+  height: 320px;
+  border: 0;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.map-frame.ready { opacity: 1; }
 
-/* Facade bản đồ (thay iframe cho tới khi bấm) */
-.map-facade {
-  position: relative;
+/* Lớp phủ bản đồ: hiện khi đang tải / lỗi (nhấn để chỉ đường) */
+.map-cover {
+  position: absolute;
+  inset: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  width: 100%;
-  height: 320px;
-  border: 0;
-  cursor: pointer;
   overflow: hidden;
   background: #eef1ec;
   color: var(--wine-1);
-  transition: background 0.25s ease;
+  text-decoration: none;
 }
-.map-facade:hover { background: #e7ebe4; }
+.map-cover.error { background: #f2ece4; }
 .map-grid {
   position: absolute;
   inset: 0;
